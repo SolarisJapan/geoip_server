@@ -1,4 +1,5 @@
 require 'sinatra'
+require 'sinatra/cross_origin'
 require 'geoip'
 require 'multi_json'
 
@@ -62,6 +63,7 @@ END
 end
 
 get /\/(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})$/ do |ip|
+  cross_origin
   data = GeoIP.new(data_file).city(ip)
   content_type 'application/json;charset=ascii-8bit'
   headers['Cache-Control'] = "public; max-age=31536000" # = 365 (days) * 24 (hours) * 60 (minutes) * 60 (seconds)
@@ -70,6 +72,7 @@ get /\/(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})$/ do |ip|
 end
 
 get '/no-ip' do
+  cross_origin
   data = GeoIP.new(data_file).city(request.ip)
   content_type 'application/json;charset=ascii-8bit'
   headers['Cache-Control'] = "public; max-age=31536000" # = 365 (days) * 24 (hours) * 60 (minutes) * 60 (seconds)
