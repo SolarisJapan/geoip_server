@@ -69,6 +69,14 @@ get /\/(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})$/ do |ip|
   respond_with(MultiJson.encode(encode(data)))
 end
 
+get 'no-ip' do
+  data = GeoIP.new(data_file).city(request.ip)
+  content_type 'application/json;charset=ascii-8bit'
+  headers['Cache-Control'] = "public; max-age=31536000" # = 365 (days) * 24 (hours) * 60 (minutes) * 60 (seconds)
+  return "{}" unless data
+  respond_with(MultiJson.encode(encode(data)))
+end
+
 def respond_with json
   # jsonp support
   callback, variable = params[:callback], params[:variable]
