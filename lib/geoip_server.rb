@@ -2,6 +2,7 @@ require 'sinatra'
 require 'sinatra/cross_origin'
 require 'geoip'
 require 'multi_json'
+require 'countries'
 
 data_file = File.expand_path(File.join(File.dirname(__FILE__), '..', 'vendor', 'GeoLiteCity.dat'))
 
@@ -124,5 +125,7 @@ def encode data
     :area_code => data.area_code,
     # Timezone, if available
     :timezone => data.timezone,
+    # Currency Code
+    :currency_code => Country.find_country_by_alpha3(data.country_code3).currency['code']
   }
 end
