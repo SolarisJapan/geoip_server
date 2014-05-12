@@ -7,6 +7,7 @@ require 'countries'
 data_file = File.expand_path(File.join(File.dirname(__FILE__), '..', 'vendor', 'GeoLiteCity.dat'))
 
 configure :production do
+  enable :cross_origin
   begin
     require 'newrelic_rpm'
   rescue LoadError
@@ -14,67 +15,17 @@ configure :production do
 end
 
 get '/' do
-<<END
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="UTF-8">
-    <style type="text/css">
-      body {
-        font-family: Archer, Museo, Helvetica, Georgia;
-        margin: 0;
-        padding-top: 20%;
-        text-align: center;
-      }
-      code {
-        background-color: #eee;
-        display: block;
-        font-family: Iconsolata, monospace;
-        font-weight: 700;
-        line-height: 2.0em;
-      }
-      form {
-        margin-top: 20px;
-      }
-      input, button {
-        border-radius: 3px;
-        font-size: 1.0em;
-        padding: 5px;
-      }
-    </style>
-    <title>Detect a computer's location by IP address</title>
-  </head>
-  <body>
-    <h4>
-      Lookup a location by IP address. Example:
-    </h4>
-    <code>
-      curl http://#{request.env['HTTP_HOST']}/207.97.227.239
-    </code>
-    <form action="/" method="get" onsubmit="if(this.ip.value) { this.action = '/' + this.ip.value } else { return false }">
-      <input type="text" name="ip" value="#{request.env['HTTP_X_REAL_IP']}">
-      <button type="submit">Lookup!</button>
-    </form>
-    <p>
-      None of this would be possible without <a href="http://www.maxmind.com/app/geolite">MaxMind</a>.
-    </p>
-  </body>
-</html>
-END
-end
-
-get /\/(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})$/ do |ip|
   cross_origin
-  data = GeoIP.new(data_file).city(ip)
+  data = GeoIP.new(data_file).city(request.ip)
   content_type 'application/json;charset=ascii-8bit'
   headers['Cache-Control'] = "public; max-age=31536000" # = 365 (days) * 24 (hours) * 60 (minutes) * 60 (seconds)
   return "{}" unless data
   respond_with(MultiJson.encode(encode(data)))
 end
 
-get '/no-ip' do
+get /\/(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})$/ do |ip|
   cross_origin
-  data = GeoIP.new(data_file).city(request.ip)
+  data = GeoIP.new(data_file).city(ip)
   content_type 'application/json;charset=ascii-8bit'
   headers['Cache-Control'] = "public; max-age=31536000" # = 365 (days) * 24 (hours) * 60 (minutes) * 60 (seconds)
   return "{}" unless data
