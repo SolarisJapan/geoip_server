@@ -1,4 +1,4 @@
-# GeoIP Server
+# GeoIP + Currency Server
 
 This simple Rack server is useful as a self-hosted service for making lookups to the GeoIP database from MaxMind.com
 
