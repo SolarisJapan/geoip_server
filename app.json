@@ -1,0 +1,7 @@
+{
+  "name": "GeoIP + Currency Lookup Server",
+  "description": "Query the MaxMind GeoIP data records via a self-hosted web service",
+  "repository": "https://github.com/SolarisJapan/geoip_server",
+  "website": "https://github.com/SolarisJapan/geoip_server",
+  "keywords": ["geoip", "lookup", "currency"]
+}
